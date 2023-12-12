@@ -1,15 +1,17 @@
 'use client';
 
-import Image from 'next/image'
+import gif from '../assets/sucesso.gif'
 import styles from './page.module.css'
 import { useRef, useState } from 'react';
 
 export default function Home() {
   const input = useRef<HTMLInputElement>(null);
   let [loading, setLoading] = useState(false);
+  let [counter, setCounter] = useState(5);
+  let [sent, setSent] = useState(false);
 
   async function send() {
-    if(!loading) {
+    if(!loading && input.current?.value) {
       setLoading(true);
 
       const request = await fetch("/api/register", {
@@ -26,7 +28,16 @@ export default function Home() {
       const data = await request.json();
 
       setLoading(false);
+      setSent(true);
+
+      redirectPage();
     }
+  }
+
+  function redirectPage() {
+    setInterval(() => {
+      setCounter(prevCount => prevCount - 1);
+    }, 1000);
   }
 
   return (
@@ -35,8 +46,10 @@ export default function Home() {
       <br></br>
       <input type='text' ref={input}></input>
       <button onClick={send}>{loading ? "Enviando..." : "Enviar"}</button>
-      <br />
+      <br /><br></br>
       {loading ? <img className={styles.loading} src="https://cdn.dribbble.com/users/136529/screenshots/6110695/mario_luigi.gif"/> : null}
+      {sent ? <p>Opa, brigadão, te vejo lá, agora fica com esse sucesso em {counter}</p> : null}
+      {sent ? <img className={styles.loading} src={gif}></img> : null} 
     </div>
   );
 }
